@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Parker - Parkr Valet</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-blue: #007AFF;
+            --secondary-blue: #5AC8FA;
+            --dark-blue: #0051D0;
+            --light-blue: #E3F2FD;
+            --white: #FFFFFF;
+            --light-gray: #F2F2F7;
+            --gray: #8E8E93;
+            --dark-gray: #1C1C1E;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --spacing: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark-gray);
+            line-height: 1.5;
+            background: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: var(--spacing);
+        }
+        .signup-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px var(--shadow);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .signup-header {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 24px;
+            text-align: center;
+        }
+        .signup-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .signup-body {
+            padding: 24px;
+        }
+        .form-group {
+            margin-bottom: var(--spacing);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E5E5EA;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.2s;
+            background: var(--white);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+         .btn {
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            background: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--gray);
+            border: 2px solid var(--light-gray);
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            width: 100%;
+            background-color: var(--light-gray);
+            z-index: 0;
+        }
+        .progress-bar .progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            background-color: var(--primary-blue);
+            width: 0%;
+            z-index: 0;
+            transition: width 0.3s ease;
+        }
+        .progress-step.active {
+            background: var(--primary-blue);
+            color: var(--white);
+            border-color: var(--primary-blue);
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .step-subtitle {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .disclaimer {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .checkbox-label a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        .checkbox-label a:hover {
+            text-decoration: underline;
+        }
+        .file-input-wrapper {
+            border: 2px dashed #E5E5EA;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-input-wrapper:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .file-input-wrapper .file-input-icon {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+        .success-animation {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>Become a Parker</h1>
+            <p>Join our team and start earning today.</p>
+        </div>
+        <div class="signup-body">
+            <div class="progress-bar">
+                <div class="progress"></div>
+                <div class="progress-step active" data-step="1">1</div>
+                <div class="progress-step" data-step="2">2</div>
+                <div class="progress-step" data-step="3">3</div>
+                <div class="progress-step" data-step="4">4</div>
+            </div>
+
+            <form id="signup-form" novalidate>
+                <!-- Step 1: Account Creation -->
+                <div id="step-1" class="form-step active">
+                    <h2 class="step-title">Create Your Account</h2>
+                    <p class="step-subtitle">Let's start with the basics.</p>
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                    </div>
+                    <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Step 2: Personal & Vehicle Information -->
+                <div id="step-2" class="form-step">
+                    <h2 class="step-title">Personal & Vehicle Details</h2>
+                    <p class="step-subtitle">We need this information for your profile and for safety reasons.</p>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Full Address</label>
+                        <input type="text" id="address" name="address" placeholder="123 Main St, Dallas, TX 75201" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ssn">Social Security Number (SSN)</label>
+                        <input type="text" id="ssn" name="ssn" placeholder="XXX-XX-XXXX" required>
+                        <p class="disclaimer">Your SSN is required for background check purposes. It will be encrypted and handled securely.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="driver_license">Driver's License Number</label>
+                        <input type="text" id="driver_license" name="driver_license" placeholder="e.g., D12345678" required>
+                    </div>
+                    <hr style="margin: 24px 0; border: 1px solid var(--light-gray);">
+                    <div class="form-group">
+                        <label for="make">Vehicle Make</label>
+                        <input type="text" id="make" name="make" placeholder="e.g., Toyota" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Vehicle Model</label>
+                        <input type="text" id="model" name="model" placeholder="e.g., Camry" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Vehicle Year</label>
+                        <input type="number" id="year" name="year" placeholder="e.g., 2020" min="2008" max="2025" required>
+                        <p class="disclaimer">Vehicle must be year 2008 or newer.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="license_plate">License Plate</label>
+                        <input type="text" id="license_plate" name="license_plate" placeholder="e.g., ABC-1234" required>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Document Upload -->
+                <div id="step-3" class="form-step">
+                    <h2 class="step-title">Upload Documents</h2>
+                    <p class="step-subtitle">Please provide clear photos of the following documents.</p>
+                    <div class="form-group">
+                        <label>Vehicle Registration</label>
+                        <label for="registration" class="file-input-wrapper">
+                            <div class="file-input-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <span class="file-input-text">Click to upload or drag & drop</span>
+                        </label>
+                        <input type="file" id="registration" name="registration" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Proof of Insurance</label>
+                        <label for="insurance" class="file-input-wrapper">
+                            <div class="file-input-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                            <span class="file-input-text">Click to upload or drag & drop</span>
+                        </label>
+                        <input type="file" id="insurance" name="insurance" required>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <button type="button" class="btn btn-primary next-btn">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Agreements & Submission -->
+                <div id="step-4" class="form-step">
+                    <h2 class="step-title">Final Agreements</h2>
+                    <p class="step-subtitle">Please review and agree to the following.</p>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="terms" required>
+                            I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>.
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="background_check" required>
+                            I consent to a background check.
+                        </label>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary prev-btn"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Confirmation -->
+                <div id="step-5" class="form-step">
+                    <div class="success-animation">
+                        <div class="success-checkmark">
+                            <i class="fas fa-check" style="color: white; font-size: 32px;"></i>
+                        </div>
+                        <h2 class="step-title">Application Submitted!</h2>
+                        <p class="step-subtitle">Thank you for applying to become a Parker. We are reviewing your application and will notify you via email within 3-5 business days.</p>
+                        <a href="index.html" class="btn btn-primary">Back to Home</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signup-form');
+            const steps = Array.from(form.querySelectorAll('.form-step'));
+            const nextButtons = form.querySelectorAll('.next-btn');
+            const prevButtons = form.querySelectorAll('.prev-btn');
+            const progressBar = document.querySelector('.progress-bar .progress');
+            const progressSteps = document.querySelectorAll('.progress-step');
+
+            let currentStep = 0;
+
+            function updateProgress() {
+                progressSteps.forEach((step, index) => {
+                    if (index < currentStep + 1) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+                const progressPercentage = (currentStep / (progressSteps.length - 1)) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+
+            function showStep(stepIndex) {
+                steps.forEach((step, index) => {
+                    step.classList.toggle('active', index === stepIndex);
+                });
+                updateProgress();
+            }
+
+            function validateStep(stepIndex) {
+                const currentStepFields = steps[stepIndex].querySelectorAll('input[required]');
+                let isValid = true;
+                currentStepFields.forEach(field => {
+                    if (!field.value.trim() || (field.type === 'checkbox' && !field.checked)) {
+                        isValid = false;
+                        field.style.borderColor = 'var(--danger)';
+                    } else {
+                        field.style.borderColor = '#E5E5EA';
+                    }
+                });
+                return isValid;
+            }
+
+            nextButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (validateStep(currentStep) && currentStep < steps.length - 2) {
+                        currentStep++;
+                        showStep(currentStep);
+                    }
+                });
+            });
+
+            prevButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (currentStep > 0) {
+                        currentStep--;
+                        showStep(currentStep);
+                    }
+                });
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (validateStep(currentStep)) {
+                    console.log('Form submitted with data:', new FormData(form));
+                    currentStep = steps.length - 1; // Go to confirmation step
+                    showStep(currentStep);
+                    document.querySelector('.progress-bar').style.display = 'none';
+                }
+            });
+
+            // File input UI
+            document.querySelectorAll('.file-input-wrapper').forEach(wrapper => {
+                const input = wrapper.nextElementSibling;
+                const text = wrapper.querySelector('.file-input-text');
+
+                input.addEventListener('change', () => {
+                    if (input.files.length > 0) {
+                        text.textContent = input.files[0].name;
+                        wrapper.style.borderColor = 'var(--success)';
+                    } else {
+                        text.textContent = 'Click to upload or drag & drop';
+                    }
+                });
+            });
+
+            showStep(currentStep);
+        });
+    </script>
+</body>
+</html>

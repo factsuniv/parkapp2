@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Parkr Valet</title>
+
+    <!-- Google Fonts: Inter for that clean, premium look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="layout-container">
+        <div id="app">
+            <!-- Login Screen -->
+            <div id="login-screen" class="screen active">
+                <div class="login-content">
+                    <div class="logo-container">
+                        <div class="logo-icon">P</div>
+                        <h1>Parkr Valet</h1>
+                        <p>Premium Peer-to-Peer Parking</p>
+                    </div>
+
+                    <div class="login-form">
+                        <div class="input-group">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" placeholder="Email" value="demo@parkr.com" readonly>
+                        </div>
+                        <div class="input-group">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" placeholder="Password" value="********" readonly>
+                        </div>
+                        <button id="login-btn" class="btn-primary">
+                            <span>Sign In</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <p class="login-footer">Don't have an account? <span>Sign Up</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main App Screen -->
+            <div id="main-screen" class="screen">
+                <!-- Map Container -->
+                <div id="map"></div>
+
+                <!-- Top Search Bar / Header -->
+                <div class="app-header">
+                    <button class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+                    <div class="location-selector">
+                        <span id="current-location-text">Downtown Dallas</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="profile-pic">
+                        <img src="https://ui-avatars.com/api/?name=User&background=007AFF&color=fff" alt="Profile">
+                    </div>
+                </div>
+
+                <!-- Location Toggle (Demo Feature) -->
+                <div class="location-toggles">
+                    <button class="toggle-chip active" data-loc="downtown">Downtown (AM)</button>
+                    <button class="toggle-chip" data-loc="plano">Legacy Plano (PM)</button>
+                    <button class="toggle-chip" data-loc="legacy_west">Legacy West</button>
+                </div>
+
+                <!-- Bottom Sheet / Booking UI -->
+                <div id="bottom-sheet" class="bottom-sheet">
+                    <div class="drag-handle"></div>
+
+                    <!-- State: Idle (Searching) -->
+                    <div id="state-idle" class="sheet-content active">
+                        <h2>Find a Spot</h2>
+                        <div class="search-input">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="mobile-search-input" placeholder="Where to?">
+                        </div>
+                        <div class="recent-places">
+                            <div class="place-item">
+                                <div class="place-icon"><i class="fa-solid fa-briefcase"></i></div>
+                                <div class="place-info">
+                                    <h4>Work</h4>
+                                    <p>123 Main St, Dallas</p>
+                                </div>
+                            </div>
+                            <div class="place-item">
+                                <div class="place-icon"><i class="fa-solid fa-utensils"></i></div>
+                                <div class="place-info">
+                                    <h4>Dinner</h4>
+                                    <p>Legacy West, Plano</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- State: Spot Selected -->
+                    <div id="state-selected" class="sheet-content">
+                        <div class="spot-header">
+                            <div class="spot-info">
+                                <h3>Premium Street Spot</h3>
+                                <p class="distance">2 min away • 0.1 mi</p>
+                                <div class="rating">
+                                    <i class="fa-solid fa-star"></i> 4.9 (Parker: Sarah)
+                                </div>
+                            </div>
+                            <div class="spot-price">
+                                $12.00
+                            </div>
+                        </div>
+                        <div class="parker-preview">
+                            <img src="https://ui-avatars.com/api/?name=Sarah&background=random" alt="Parker">
+                            <div class="parker-details">
+                                <p>Sarah is holding this spot.</p>
+                                <span class="car-info">Blue Toyota Camry • LP: 8X2-991</span>
+                            </div>
+                        </div>
+                        <button id="reserve-btn" class="btn-primary full-width">Reserve Spot</button>
+                    </div>
+
+                    <!-- State: En Route -->
+                    <div id="state-route" class="sheet-content">
+                        <div class="route-status">
+                            <h3>Navigating to Spot...</h3>
+                            <p>Arriving in 2 minutes</p>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-secondary"><i class="fa-solid fa-phone"></i> Call Sarah</button>
+                            <button id="arrived-btn" class="btn-primary">I've Arrived</button>
+                        </div>
+                    </div>
+
+                    <!-- State: Exchange -->
+                    <div id="state-exchange" class="sheet-content">
+                        <div class="success-icon">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <h3>You're Here!</h3>
+                        <p>Look for the Blue "P" sticker on the dash.</p>
+                        <button id="complete-btn" class="btn-primary full-width">Confirm Exchange</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Sidebar -->
+        <aside id="desktop-sidebar">
+            <div class="sidebar-header">
+                <h2>Available Spots</h2>
+                <div class="search-input">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="desktop-search-input" placeholder="Search spots...">
+                </div>
+            </div>
+            <div id="spots-list" class="spots-list">
+                <!-- Spots will be injected here via JS -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
