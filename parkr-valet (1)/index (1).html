@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkr Valet - Live Parking Platform</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCO0kKndUNlmQi3B5mxy4dblg_8WYcuKuk&libraries=places"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-blue: #007AFF;
+            --secondary-blue: #5AC8FA;
+            --dark-blue: #0051D0;
+            --light-blue: #E3F2FD;
+            --white: #FFFFFF;
+            --light-gray: #F2F2F7;
+            --gray: #8E8E93;
+            --dark-gray: #1C1C1E;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --spacing: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            color: var(--dark-gray);
+            line-height: 1.5;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        /* Mobile-First Responsive Container */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 var(--spacing);
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 0 24px;
+            }
+        }
+
+        /* Header - Mobile Optimized */
+        .header {
+            background: var(--white);
+            box-shadow: 0 1px 3px var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 60px;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 var(--spacing);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo .p-icon {
+            background: var(--primary-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .nav-menu {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .nav-menu {
+                display: flex;
+                list-style: none;
+                gap: 24px;
+                align-items: center;
+            }
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Buttons - Apple Style */
+        .btn {
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--primary-blue);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            min-height: 36px;
+        }
+
+        /* Hero Section - Mobile First */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            padding: 80px 0 60px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+            opacity: 0.9;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (min-width: 768px) {
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            .hero p {
+                font-size: 1.25rem;
+            }
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .hero-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+        /* App Interface - Full Screen Mobile */
+        .app-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .app-interface.active {
+            display: flex;
+        }
+
+        .app-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 12px var(--spacing);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Tab Navigation - Mobile Optimized */
+        .tab-navigation {
+            display: flex;
+            background: var(--white);
+            border-bottom: 1px solid #E5E5EA;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            color: var(--gray);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .tab-content {
+            display: none;
+            padding: var(--spacing);
+            min-height: calc(100vh - 120px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Mobile-First Map Container */
+        .map-container {
+            height: 300px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow);
+            margin-bottom: var(--spacing);
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .map-container {
+                height: 400px;
+            }
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Search Interface */
+        .search-container {
+            margin-bottom: var(--spacing);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            border: 1.5px solid #E5E5EA;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background: var(--white);
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .search-results {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px var(--shadow);
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 16px;
+            border-bottom: 1px solid #F2F2F7;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-result-item:hover {
+            background: var(--light-gray);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Parking Level Selection */
+        .parking-levels {
+            display: grid;
+            gap: 12px;
+            margin: var(--spacing) 0;
+        }
+
+        .parking-level {
+            background: var(--white);
+            border: 2px solid #E5E5EA;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .parking-level:hover {
+            border-color: var(--primary-blue);
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .parking-level.selected {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .parking-level-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .parking-level-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .parking-level-description {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Admin Interface */
+        .admin-controls {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: var(--spacing);
+            margin-bottom: var(--spacing);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .admin-section {
+            margin-bottom: 24px;
+        }
+
+        .admin-section h4 {
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        /* Parker Interface */
+        .parker-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: var(--spacing);
+            margin-bottom: var(--spacing);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-offline {
+            background: rgba(142, 142, 147, 0.1);
+            color: var(--gray);
+        }
+
+        /* Job Cards */
+        .job-card {
+            background: var(--white);
+            border: 2px solid #E5E5EA;
+            border-radius: var(--border-radius);
+            padding: var(--spacing);
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .job-card.pending {
+            border-color: var(--warning);
+            background: rgba(255, 149, 0, 0.05);
+        }
+
+        .job-card.accepted {
+            border-color: var(--success);
+            background: rgba(52, 199, 89, 0.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: var(--spacing);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: var(--spacing);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E5E5EA;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.2s;
+            background: var(--white);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: var(--spacing);
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: var(--spacing);
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-success { color: var(--success); }
+        .text-warning { color: var(--warning); }
+        .text-danger { color: var(--danger); }
+        .mb-16 { margin-bottom: var(--spacing); }
+        .mt-16 { margin-top: var(--spacing); }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Success Animation */
+        .success-animation {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        /* Admin Pin Dropping */
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .drop-pin-mode {
+            cursor: crosshair !important;
+        }
+
+        .drop-pin-mode * {
+            cursor: crosshair !important;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            box-shadow: 0 4px 12px var(--shadow);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-item {
+            padding: 16px var(--spacing);
+            border-bottom: 1px solid #F2F2F7;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .mobile-menu-item:hover {
+            background: var(--light-gray);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab-btn {
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <div class="p-icon">P</div>
+                <span>Parkr Valet</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link">How it Works</a></li>
+                <li><a href="#" class="nav-link">Safety</a></li>
+                <li><a href="#" class="nav-link">Support</a></li>
+            </ul>
+            <div>
+                <button class="btn btn-secondary btn-small" onclick="showLogin()">Sign In</button>
+                <button class="btn btn-primary btn-small" onclick="showLogin()">Get Started</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Landing Page -->
+    <div id="landing-page">
+        <section class="hero">
+            <div class="container">
+                <h1 class="fade-in">Never Circle for Parking Again</h1>
+                <p class="fade-in">Parkr Valet connects you with verified parkers who secure the perfect spot for you. Real people, real spots, real results.</p>
+                <div class="hero-buttons fade-in">
+                    <button class="btn btn-primary" onclick="showLogin('user')">
+                        <i class="fas fa-search"></i>
+                        Find Parking
+                    </button>
+                    <button class="btn btn-secondary" onclick="showLogin('parker')">
+                        <i class="fas fa-car"></i>
+                        Become a Parker
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- App Interface -->
+    <div class="app-interface" id="app-interface">
+        <div class="app-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="p-icon" style="width: 24px; height: 24px; font-size: 12px;">P</div>
+                <span id="app-title">Parkr Valet</span>
+            </div>
+            <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; font-size: 14px; cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: all 0.2s;" 
+                    onmouseover="this.style.background='rgba(255,255,255,0.3)'" 
+                    onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="tab-navigation" id="tab-navigation">
+            <!-- Tabs will be populated based on user role -->
+        </div>
+
+        <div class="app-content">
+            <!-- Customer Tab -->
+            <div class="tab-content" id="customer-tab">
+                <div class="search-container">
+                    <h3 style="margin-bottom: 16px; color: var(--primary-blue); font-size: 20px;">Find Parking</h3>
+                    <input type="text" id="business-search" class="search-input" placeholder="Search for business or restaurant...">
+                    <div id="search-results" class="search-results hidden"></div>
+                </div>
+
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+
+                <div id="parking-selection" class="hidden">
+                    <h4 style="margin-bottom: 16px; color: var(--primary-blue);">Choose Your Parking Level</h4>
+                    <div class="parking-levels">
+                        <div class="parking-level" data-level="lot" data-price="8">
+                            <div class="parking-level-title">Just in the Lot</div>
+                            <div class="parking-level-price">$8</div>
+                            <div class="parking-level-description">Basic parking spot anywhere in the lot</div>
+                        </div>
+                        <div class="parking-level" data-level="best" data-price="15">
+                            <div class="parking-level-title">Best Spot Available</div>
+                            <div class="parking-level-price">$15</div>
+                            <div class="parking-level-description">Prime location with easy access</div>
+                        </div>
+                        <div class="parking-level" data-level="front" data-price="25">
+                            <div class="parking-level-title">At the Front</div>
+                            <div class="parking-level-price">$25</div>
+                            <div class="parking-level-description">Premium front-row parking</div>
+                        </div>
+                    </div>
+                    <button id="book-now-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="bookParking()" disabled>
+                        Select a Parking Level
+                    </button>
+                </div>
+
+                <div id="booking-status" class="hidden"></div>
+            </div>
+
+            <!-- Parker Tab -->
+            <div class="tab-content" id="parker-tab">
+                <h3 style="margin-bottom: 16px; color: var(--primary-blue); font-size: 20px;">Parker Dashboard</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="parker-earnings">$0</div>
+                        <div class="stat-label">Today's Earnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="parker-jobs">0</div>
+                        <div class="stat-label">Jobs Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="parker-rating">5.0</div>
+                        <div class="stat-label">Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="parker-status">Offline</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                </div>
+
+                <div class="parker-card">
+                    <h4 style="margin-bottom: 12px; color: var(--primary-blue);">Go Online</h4>
+                    <p style="color: var(--gray); margin-bottom: 16px;">Start accepting parking requests in your area</p>
+                    <button id="toggle-online-btn" class="btn btn-primary" onclick="toggleOnlineStatus()">Go Online</button>
+                </div>
+
+                <div id="active-jobs">
+                    <h4 style="margin-bottom: 16px; color: var(--primary-blue);">Job Requests</h4>
+                    <div id="job-list"></div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div class="tab-content" id="admin-tab">
+                <h3 style="margin-bottom: 16px; color: var(--primary-blue); font-size: 20px;">Admin Dashboard</h3>
+                
+                <div class="admin-controls">
+                    <div class="admin-section">
+                        <h4>Map Management</h4>
+                        <button id="pin-mode-btn" class="btn btn-secondary" onclick="togglePinDropMode()">
+                            <i class="fas fa-map-pin"></i>
+                            Drop Pin Mode: OFF
+                        </button>
+                        <p style="color: var(--gray); font-size: 14px; margin-top: 8px;">
+                            Click the button above, then click on the map to add parker locations
+                        </p>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h4>Parker Management</h4>
+                        <button class="btn btn-primary" onclick="showAddParkerModal()">
+                            <i class="fas fa-user-plus"></i>
+                            Add New Parker
+                        </button>
+                    </div>
+                    
+                    <div class="admin-section">
+                        <h4>System Overview</h4>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="total-parkers">0</div>
+                                <div class="stat-label">Total Parkers</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="active-parkers">0</div>
+                                <div class="stat-label">Online Now</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="total-bookings">0</div>
+                                <div class="stat-label">Total Bookings</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="total-revenue">$0</div>
+                                <div class="stat-label">Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="map-container">
+                    <div id="admin-map"></div>
+                    <div class="map-controls">
+                        <button class="btn btn-small btn-secondary" onclick="clearMap()">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="parker-list">
+                    <h4 style="margin-bottom: 16px; color: var(--primary-blue);">Registered Parkers</h4>
+                    <div id="parkers-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal hidden" id="login-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 24px; color: var(--primary-blue); text-align: center;">Welcome to Parkr Valet</h3>
+            
+            <div class="form-group">
+                <label>Account Type</label>
+                <select id="account-type">
+                    <option value="user">Customer</option>
+                    <option value="parker">Parker</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="login()">
+                <span id="login-btn-text">Sign In</span>
+                <div class="spinner hidden" id="login-spinner"></div>
+            </button>
+            <a href="signup.html" class="btn btn-secondary" style="width: 100%; text-decoration: none;">Sign Up to be a Parker</a>
+
+            
+            
+            
+            <button class="btn btn-secondary" style="width: 100%;" onclick="hideLogin()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Add Parker Modal -->
+    <div class="modal hidden" id="add-parker-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 24px; color: var(--primary-blue);">Add New Parker</h3>
+            
+            <div class="form-group">
+                <label>Parker Name</label>
+                <input type="text" id="parker-name" placeholder="Full name">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="parker-email" placeholder="parker@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="parker-phone" placeholder="(555) 123-4567">
+            </div>
+            
+            <div class="form-group">
+                <label>Vehicle</label>
+                <input type="text" id="parker-vehicle" placeholder="Toyota Camry - ABC123">
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="hideAddParkerModal()">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="addParker()">Add Parker</button>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Global Variables
+        let map = null;
+        let adminMap = null;
+        let currentUser = null;
+        let selectedBusiness = null;
+        let selectedParkingLevel = null;
+        let pinDropMode = false;
+        let placesService = null;
+        let markers = [];
+        let adminMarkers = [];
+
+        // Data Storage using localStorage
+        const Storage = {
+            get: (key) => {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data === null) {
+                        return key === 'users' || key === 'parkers' || key === 'bookings' || key === 'jobs' ? [] : {};
+                    }
+                    return JSON.parse(data);
+                } catch (error) {
+                    console.error('Storage get error:', error);
+                    return key === 'users' || key === 'parkers' || key === 'bookings' || key === 'jobs' ? [] : {};
+                }
+            },
+            set: (key, data) => {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                    console.log('Storage set:', key, data);
+                } catch (error) {
+                    console.error('Storage set error:', error);
+                }
+            },
+            append: (key, item) => {
+                const data = Storage.get(key);
+                if (!Array.isArray(data)) return;
+                data.push(item);
+                Storage.set(key, data);
+            }
+        };
+
+        // Initialize app data structure
+        function initializeStorage() {
+            // Always reset users for demo purposes to ensure fresh data
+            const users = [
+                {
+                    id: 'user1',
+                    email: 'user@demo.com',
+                    password: 'CustomerDemo2024!',
+                    type: 'user',
+                    name: 'Demo Customer'
+                },
+                {
+                    id: 'parker1',
+                    email: 'parker@demo.com',
+                    password: 'ParkerSecure2024!',
+                    type: 'parker',
+                    name: 'Demo Parker',
+                    vehicle: 'Honda Civic - XYZ789',
+                    phone: '(555) 123-4567',
+                    rating: 4.9,
+                    earnings: 127,
+                    jobsCompleted: 23,
+                    isOnline: false
+                },
+                {
+                    id: 'admin1',
+                    email: 'admin@parkr.com',
+                    password: 'AdminMaster2024#Secure',
+                    type: 'admin',
+                    name: 'System Administrator'
+                }
+            ];
+            
+            Storage.set('users', users);
+            console.log('Users initialized:', users);
+            
+            if (!Storage.get('parkers')) {
+                Storage.set('parkers', []);
+            }
+            if (!Storage.get('bookings')) {
+                Storage.set('bookings', []);
+            }
+            if (!Storage.get('jobs')) {
+                Storage.set('jobs', []);
+            }
+        }
+
+        // Authentication
+        function showLogin(userType = 'user') {
+            document.getElementById('account-type').value = userType;
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function hideLogin() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+        }
+
+        function quickLogin(type) {
+            const credentials = {
+                'user': { email: 'user@demo.com', password: 'CustomerDemo2024!' },
+                'parker': { email: 'parker@demo.com', password: 'ParkerSecure2024!' },
+                'admin': { email: 'admin@parkr.com', password: 'AdminMaster2024#Secure' }
+            };
+            
+            if (credentials[type]) {
+                document.getElementById('account-type').value = type;
+                document.getElementById('login-email').value = credentials[type].email;
+                document.getElementById('login-password').value = credentials[type].password;
+                login();
+            }
+        }
+
+        function login() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const accountType = document.getElementById('account-type').value;
+
+            if (!email || !password) {
+                alert('Please enter both email and password');
+                return;
+            }
+
+            // Show loading
+            const btnText = document.getElementById('login-btn-text');
+            const spinner = document.getElementById('login-spinner');
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+
+            setTimeout(() => {
+                try {
+                    const users = Storage.get('users');
+                    console.log('Available users:', users);
+                    console.log('Attempting login with:', { email, accountType });
+                    
+                    const user = users.find(u => 
+                        u.email.toLowerCase() === email.toLowerCase() && 
+                        u.password === password && 
+                        u.type === accountType
+                    );
+
+                    console.log('Found user:', user);
+
+                    if (user) {
+                        currentUser = { ...user };
+                        console.log('Login successful for:', currentUser);
+                        hideLogin();
+                        showApp();
+                    } else {
+                        alert('Invalid credentials. Please check:\n\nCustomer: user@demo.com / CustomerDemo2024!\nParker: parker@demo.com / ParkerSecure2024!\nAdmin: admin@parkr.com / AdminMaster2024#Secure');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('Login error occurred. Please try again.');
+                }
+
+                // Hide loading
+                btnText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+            }, 500);
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('app-interface').classList.remove('active');
+            document.getElementById('landing-page').style.display = 'block';
+            
+            // Clear any intervals or ongoing processes
+            if (window.jobCheckInterval) {
+                clearInterval(window.jobCheckInterval);
+            }
+        }
+
+        // App Interface
+        function showApp() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('app-interface').classList.add('active');
+            setupTabs();
+            initializeMaps();
+            
+            // Set app title based on user type
+            const titles = {
+                'user': 'Find Parking',
+                'parker': 'Parker Dashboard', 
+                'admin': 'Admin Panel'
+            };
+            document.getElementById('app-title').textContent = titles[currentUser.type] || 'Parkr Valet';
+            
+            // Initialize user-specific features
+            if (currentUser.type === 'parker') {
+                updateParkerStats();
+                startJobListener();
+            } else if (currentUser.type === 'admin') {
+                updateAdminStats();
+            }
+            
+            // Setup business search for customers
+            if (currentUser.type === 'user') {
+                setupBusinessSearch();
+            }
+        }
+
+        function setupTabs() {
+            const tabNav = document.getElementById('tab-navigation');
+            const tabs = {
+                'user': [{ id: 'customer', label: 'Find Parking', icon: 'search' }],
+                'parker': [{ id: 'parker', label: 'Dashboard', icon: 'car' }],
+                'admin': [{ id: 'admin', label: 'Admin Panel', icon: 'cog' }]
+            };
+
+            const userTabs = tabs[currentUser.type] || [];
+            if (userTabs.length > 0) {
+                tabNav.innerHTML = userTabs.map((tab, index) => `
+                    <button class="tab-btn ${index === 0 ? 'active' : ''}" onclick="switchTab('${tab.id}')">
+                        <i class="fas fa-${tab.icon}"></i> ${tab.label}
+                    </button>
+                `).join('');
+
+                // Show appropriate tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                const activeTab = document.getElementById(`${userTabs[0].id}-tab`);
+                if (activeTab) {
+                    activeTab.classList.add('active');
+                }
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+
+        // Map Initialization
+        function initializeMaps() {
+            // Dallas center coordinates
+            const dallasCenter = { lat: 32.7767, lng: -96.7970 };
+            
+            // Customer map
+            if (document.getElementById('map') && currentUser.type === 'user') {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 11,
+                    center: dallasCenter,
+                    styles: [
+                        {
+                            featureType: 'poi',
+                            elementType: 'labels',
+                            stylers: [{ visibility: 'simplified' }]
+                        }
+                    ]
+                });
+                
+                placesService = new google.maps.places.PlacesService(map);
+                loadParkerLocations();
+            }
+            
+            // Admin map
+            if (document.getElementById('admin-map') && currentUser.type === 'admin') {
+                adminMap = new google.maps.Map(document.getElementById('admin-map'), {
+                    zoom: 11,
+                    center: dallasCenter,
+                    styles: [
+                        {
+                            featureType: 'poi',
+                            elementType: 'labels',
+                            stylers: [{ visibility: 'simplified' }]
+                        }
+                    ]
+                });
+                
+                loadAdminMarkers();
+                setupMapClickListener();
+            }
+        }
+
+        function loadParkerLocations() {
+            // Clear existing markers
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            
+            const parkers = Storage.get('parkers');
+            parkers.forEach(parker => {
+                if (parker.location && parker.isOnline) {
+                    const marker = new google.maps.Marker({
+                        position: parker.location,
+                        map: map,
+                        title: `${parker.name} - Available`,
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="16" cy="16" r="15" fill="#007AFF" stroke="white" stroke-width="2"/>
+                                    <text x="16" y="21" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">P</text>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(32, 32)
+                        }
+                    });
+                    
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div style="padding: 10px;">
+                                <h4>${parker.name}</h4>
+                                <p><strong>Rating:</strong> ${parker.rating}★</p>
+                                <p><strong>Vehicle:</strong> ${parker.vehicle}</p>
+                                <p><strong>Status:</strong> Available</p>
+                            </div>
+                        `
+                    });
+                    
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                    });
+                    
+                    markers.push(marker);
+                }
+            });
+        }
+
+        function loadAdminMarkers() {
+            adminMarkers.forEach(marker => marker.setMap(null));
+            adminMarkers = [];
+            
+            const parkers = Storage.get('parkers');
+            parkers.forEach(parker => {
+                if (parker.location) {
+                    const marker = new google.maps.Marker({
+                        position: parker.location,
+                        map: adminMap,
+                        title: parker.name,
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="16" cy="16" r="15" fill="${parker.isOnline ? '#34C759' : '#8E8E93'}" stroke="white" stroke-width="2"/>
+                                    <text x="16" y="21" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">P</text>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(32, 32)
+                        }
+                    });
+                    
+                    adminMarkers.push(marker);
+                }
+            });
+        }
+
+        // Business Search
+        function setupBusinessSearch() {
+            const searchInput = document.getElementById('business-search');
+            const resultsContainer = document.getElementById('search-results');
+            
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                if (query.length < 3) {
+                    resultsContainer.classList.add('hidden');
+                    return;
+                }
+                
+                searchBusinesses(query);
+            });
+
+            // Setup parking level selection
+            setupParkingLevelSelection();
+        }
+
+        function setupParkingLevelSelection() {
+            const parkingLevels = document.querySelectorAll('.parking-level');
+            parkingLevels.forEach(level => {
+                level.addEventListener('click', function() {
+                    const levelType = this.getAttribute('data-level');
+                    const price = parseInt(this.getAttribute('data-price'));
+                    selectParkingLevel(levelType, price);
+                });
+            });
+        }
+
+        function searchBusinesses(query) {
+            if (!placesService || !map) {
+                console.log('Places service not available, showing mock results');
+                // Show mock results for demo
+                const mockResults = [
+                    { place_id: 'mock1', name: 'TopGolf - The Colony', formatted_address: '5750 SH-121, The Colony, TX 75056' },
+                    { place_id: 'mock2', name: 'Legacy West', formatted_address: '7700 Windrose Ave, Plano, TX 75024' },
+                    { place_id: 'mock3', name: 'American Airlines Center', formatted_address: '2500 Victory Ave, Dallas, TX 75219' },
+                    { place_id: 'mock4', name: 'Deep Ellum', formatted_address: 'Deep Ellum, Dallas, TX 75226' },
+                    { place_id: 'mock5', name: 'Grandscape', formatted_address: '5752 Grandscape Blvd, The Colony, TX 75056' }
+                ].filter(place => place.name.toLowerCase().includes(query.toLowerCase()));
+                
+                displaySearchResults(mockResults);
+                return;
+            }
+
+            const request = {
+                query: query,
+                fields: ['name', 'geometry', 'formatted_address', 'place_id'],
+                locationBias: map.getBounds()
+            };
+            
+            placesService.textSearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesService.OK && results) {
+                    displaySearchResults(results);
+                } else {
+                    console.log('Places search failed, showing mock results');
+                    // Fallback to mock results
+                    const mockResults = [
+                        { place_id: 'mock1', name: 'TopGolf - The Colony', formatted_address: '5750 SH-121, The Colony, TX 75056' },
+                        { place_id: 'mock2', name: 'Legacy West', formatted_address: '7700 Windrose Ave, Plano, TX 75024' }
+                    ];
+                    displaySearchResults(mockResults);
+                }
+            });
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('search-results');
+            container.innerHTML = results.slice(0, 5).map(place => `
+                <div class="search-result-item" onclick="selectBusiness('${place.place_id}', '${place.name.replace(/'/g, "\\'")}', '${place.formatted_address.replace(/'/g, "\\'")}')">
+                    <div style="font-weight: 600; margin-bottom: 4px;">${place.name}</div>
+                    <div style="color: var(--gray); font-size: 14px;">${place.formatted_address}</div>
+                </div>
+            `).join('');
+            container.classList.remove('hidden');
+        }
+
+        function selectBusiness(placeId, name, address) {
+            selectedBusiness = { placeId, name, address };
+            document.getElementById('search-results').classList.add('hidden');
+            document.getElementById('business-search').value = name;
+            document.getElementById('parking-selection').classList.remove('hidden');
+            
+            // Center map on selected business
+            if (placesService && !placeId.startsWith('mock')) {
+                placesService.getDetails({ placeId: placeId }, (place, status) => {
+                    if (status === google.maps.places.PlacesService.OK) {
+                        map.setCenter(place.geometry.location);
+                        map.setZoom(15);
+                        
+                        addBusinessMarker(place.geometry.location, place.name);
+                    }
+                });
+            } else {
+                // Handle mock data with predefined locations
+                const mockLocations = {
+                    'mock1': { lat: 33.1581, lng: -96.8353 }, // TopGolf/Grandscape area
+                    'mock2': { lat: 33.0781, lng: -96.8236 }, // Legacy West
+                    'mock3': { lat: 32.7905, lng: -96.8102 }, // American Airlines Center
+                    'mock4': { lat: 32.7831, lng: -96.7668 }, // Deep Ellum
+                    'mock5': { lat: 33.1581, lng: -96.8353 }  // Grandscape
+                };
+                
+                const location = mockLocations[placeId] || { lat: 32.7767, lng: -96.7970 };
+                if (map) {
+                    map.setCenter(location);
+                    map.setZoom(15);
+                    addBusinessMarker(location, name);
+                }
+            }
+        }
+
+        function addBusinessMarker(location, name) {
+            if (map) {
+                new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: name,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="16" cy="16" r="15" fill="#FF3B30" stroke="white" stroke-width="2"/>
+                                <text x="16" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">📍</text>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(32, 32)
+                    }
+                });
+            }
+        }
+
+        function selectParkingLevel(level, price) {
+            selectedParkingLevel = { level, price };
+            
+            // Update UI
+            document.querySelectorAll('.parking-level').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+            
+            const btn = document.getElementById('book-now-btn');
+            btn.textContent = `Book ${level === 'lot' ? 'Lot' : level === 'best' ? 'Best Spot' : 'Front'} Parking - $${price}`;
+            btn.disabled = false;
+        }
+
+        function bookParking() {
+            if (!selectedBusiness || !selectedParkingLevel) {
+                alert('Please select a business and parking level');
+                return;
+            }
+            
+            // Create job request
+            const job = {
+                id: 'job_' + Date.now(),
+                userId: currentUser.id,
+                business: selectedBusiness,
+                parkingLevel: selectedParkingLevel,
+                status: 'pending',
+                timestamp: new Date().toISOString(),
+                customerName: currentUser.name
+            };
+            
+            // Add to jobs
+            const jobs = Storage.get('jobs');
+            jobs.push(job);
+            Storage.set('jobs', jobs);
+            
+            // Show booking status
+            showBookingStatus(job);
+            
+            // Notify online parkers (in real app, this would be push notifications)
+            notifyParkers(job);
+        }
+
+        function showBookingStatus(job) {
+            const statusContainer = document.getElementById('booking-status');
+            statusContainer.innerHTML = `
+                <div class="parker-card">
+                    <h4 style="color: var(--warning);">Booking Request Sent</h4>
+                    <div style="margin: 16px 0;">
+                        <p><strong>Business:</strong> ${job.business.name}</p>
+                        <p><strong>Parking Level:</strong> ${job.parkingLevel.level === 'lot' ? 'Just in the Lot' : job.parkingLevel.level === 'best' ? 'Best Spot Available' : 'At the Front'}</p>
+                        <p><strong>Price:</strong> $${job.parkingLevel.price}</p>
+                        <p><strong>Status:</strong> <span class="status-indicator status-pending">Waiting for Parker</span></p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="cancelBooking('${job.id}')">Cancel Request</button>
+                </div>
+            `;
+            statusContainer.classList.remove('hidden');
+            
+            // Hide parking selection
+            document.getElementById('parking-selection').classList.add('hidden');
+            
+            // Check for acceptance periodically
+            checkJobStatus(job.id);
+        }
+
+        function checkJobStatus(jobId) {
+            const interval = setInterval(() => {
+                const jobs = Storage.get('jobs');
+                const job = jobs.find(j => j.id === jobId);
+                
+                if (job && job.status === 'accepted') {
+                    clearInterval(interval);
+                    showBookingConfirmed(job);
+                } else if (job && job.status === 'cancelled') {
+                    clearInterval(interval);
+                    showBookingCancelled();
+                }
+            }, 2000);
+            
+            // Auto-cancel after 5 minutes
+            setTimeout(() => {
+                clearInterval(interval);
+                const jobs = Storage.get('jobs');
+                const job = jobs.find(j => j.id === jobId);
+                if (job && job.status === 'pending') {
+                    job.status = 'expired';
+                    Storage.set('jobs', jobs);
+                    showBookingExpired();
+                }
+            }, 300000);
+        }
+
+        function showBookingConfirmed(job) {
+            const statusContainer = document.getElementById('booking-status');
+            statusContainer.innerHTML = `
+                <div class="success-animation">
+                    <div class="success-checkmark">
+                        <i class="fas fa-check" style="color: white; font-size: 32px;"></i>
+                    </div>
+                    <h4 style="color: var(--success); margin-bottom: 16px;">Booking Confirmed!</h4>
+                    <div style="background: var(--light-gray); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                        <p><strong>Parker:</strong> ${job.parkerName || 'Assigned Parker'}</p>
+                        <p><strong>ETA:</strong> 5-10 minutes</p>
+                        <p><strong>Look for:</strong> Blue "P" sticker on dashboard</p>
+                        <p><strong>Contact:</strong> ${job.parkerPhone || '(555) 123-4567'}</p>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="startNavigation()">
+                        <i class="fas fa-navigation"></i>
+                        Get Directions
+                    </button>
+                </div>
+            `;
+        }
+
+        function cancelBooking(jobId) {
+            const jobs = Storage.get('jobs');
+            const job = jobs.find(j => j.id === jobId);
+            if (job) {
+                job.status = 'cancelled';
+                Storage.set('jobs', jobs);
+            }
+            
+            // Reset UI
+            document.getElementById('booking-status').classList.add('hidden');
+            document.getElementById('parking-selection').classList.remove('hidden');
+        }
+
+        function startNavigation() {
+            alert('Navigation started! Look for the parker with the blue "P" sticker.');
+        }
+
+        // Parker Functions
+        function updateParkerStats() {
+            const parker = Storage.get('users').find(u => u.id === currentUser.id);
+            if (parker) {
+                document.getElementById('parker-earnings').textContent = `$${parker.earnings || 0}`;
+                document.getElementById('parker-jobs').textContent = parker.jobsCompleted || 0;
+                document.getElementById('parker-rating').textContent = parker.rating || 5.0;
+                document.getElementById('parker-status').textContent = parker.isOnline ? 'Online' : 'Offline';
+                
+                const statusEl = document.getElementById('parker-status');
+                statusEl.className = `stat-value ${parker.isOnline ? 'text-success' : 'text-danger'}`;
+                
+                const btn = document.getElementById('toggle-online-btn');
+                btn.textContent = parker.isOnline ? 'Go Offline' : 'Go Online';
+                btn.className = `btn ${parker.isOnline ? 'btn-secondary' : 'btn-primary'}`;
+            }
+        }
+
+        function toggleOnlineStatus() {
+            const users = Storage.get('users');
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            
+            if (userIndex !== -1) {
+                users[userIndex].isOnline = !users[userIndex].isOnline;
+                currentUser.isOnline = users[userIndex].isOnline;
+                Storage.set('users', users);
+                updateParkerStats();
+                
+                if (currentUser.isOnline) {
+                    // Request location for parker
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            const location = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+                            
+                            // Save parker location
+                            const parkers = Storage.get('parkers');
+                            const existingParker = parkers.find(p => p.userId === currentUser.id);
+                            
+                            if (existingParker) {
+                                existingParker.location = location;
+                                existingParker.isOnline = true;
+                            } else {
+                                parkers.push({
+                                    id: 'parker_' + Date.now(),
+                                    userId: currentUser.id,
+                                    name: currentUser.name,
+                                    vehicle: currentUser.vehicle,
+                                    rating: currentUser.rating || 5.0,
+                                    location: location,
+                                    isOnline: true
+                                });
+                            }
+                            
+                            Storage.set('parkers', parkers);
+                        });
+                    }
+                } else {
+                    // Remove from online parkers
+                    const parkers = Storage.get('parkers');
+                    const updatedParkers = parkers.map(p => {
+                        if (p.userId === currentUser.id) {
+                            p.isOnline = false;
+                        }
+                        return p;
+                    });
+                    Storage.set('parkers', updatedParkers);
+                }
+            }
+        }
+
+        function startJobListener() {
+            window.jobCheckInterval = setInterval(updateJobList, 3000);
+            updateJobList();
+        }
+
+        function updateJobList() {
+            const jobs = Storage.get('jobs').filter(job => 
+                job.status === 'pending' || 
+                (job.status === 'accepted' && job.parkerId === currentUser.id)
+            );
+            
+            const container = document.getElementById('job-list');
+            container.innerHTML = jobs.map(job => `
+                <div class="job-card ${job.status}">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 12px;">
+                        <h5>${job.business.name}</h5>
+                        <span style="color: var(--success); font-weight: bold;">$${job.parkingLevel.price}</span>
+                    </div>
+                    <p style="color: var(--gray); margin-bottom: 8px;">${job.business.address}</p>
+                    <p style="margin-bottom: 12px;"><strong>Level:</strong> ${job.parkingLevel.level === 'lot' ? 'Just in the Lot' : job.parkingLevel.level === 'best' ? 'Best Spot Available' : 'At the Front'}</p>
+                    <p style="margin-bottom: 16px;"><strong>Customer:</strong> ${job.customerName}</p>
+                    
+                    ${job.status === 'pending' ? `
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary btn-small" onclick="declineJob('${job.id}')">Decline</button>
+                            <button class="btn btn-primary btn-small" onclick="acceptJob('${job.id}')">Accept Job</button>
+                        </div>
+                    ` : `
+                        <div class="status-indicator status-active">
+                            <i class="fas fa-check-circle"></i>
+                            Job Accepted - Customer Notified
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function acceptJob(jobId) {
+            const jobs = Storage.get('jobs');
+            const job = jobs.find(j => j.id === jobId);
+            
+            if (job) {
+                job.status = 'accepted';
+                job.parkerId = currentUser.id;
+                job.parkerName = currentUser.name;
+                job.parkerPhone = currentUser.phone || '(555) 123-4567';
+                job.acceptedAt = new Date().toISOString();
+                Storage.set('jobs', jobs);
+                
+                // Update parker earnings
+                const users = Storage.get('users');
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    const parkerCut = Math.floor(job.parkingLevel.price * 0.7); // Parker gets 70%
+                    users[userIndex].earnings = (users[userIndex].earnings || 0) + parkerCut;
+                    users[userIndex].jobsCompleted = (users[userIndex].jobsCompleted || 0) + 1;
+                    currentUser.earnings = users[userIndex].earnings;
+                    currentUser.jobsCompleted = users[userIndex].jobsCompleted;
+                    Storage.set('users', users);
+                    updateParkerStats();
+                }
+                
+                // Add to bookings for revenue tracking
+                const bookings = Storage.get('bookings');
+                bookings.push({
+                    id: 'booking_' + Date.now(),
+                    jobId: jobId,
+                    customerId: job.userId,
+                    parkerId: currentUser.id,
+                    amount: job.parkingLevel.price,
+                    revenue: Math.floor(job.parkingLevel.price * 0.3), // Platform gets 30%
+                    timestamp: new Date().toISOString()
+                });
+                Storage.set('bookings', bookings);
+                
+                updateJobList();
+                
+                // Show success message
+                alert(`Job accepted! You'll earn $${Math.floor(job.parkingLevel.price * 0.7)} for this parking request.`);
+            }
+        }
+
+        function declineJob(jobId) {
+            // Job remains available for other parkers
+            updateJobList();
+        }
+
+        function notifyParkers(job) {
+            // In a real app, this would send push notifications
+            console.log('Job notification sent to online parkers:', job);
+        }
+
+        // Admin Functions
+        function updateAdminStats() {
+            const parkers = Storage.get('parkers');
+            const bookings = Storage.get('bookings');
+            const jobs = Storage.get('jobs');
+            
+            document.getElementById('total-parkers').textContent = parkers.length;
+            document.getElementById('active-parkers').textContent = parkers.filter(p => p.isOnline).length;
+            document.getElementById('total-bookings').textContent = bookings.length;
+            
+            const revenue = jobs.filter(j => j.status === 'accepted')
+                .reduce((sum, job) => sum + (job.parkingLevel.price * 0.3), 0);
+            document.getElementById('total-revenue').textContent = `$${revenue.toFixed(0)}`;
+            
+            updateParkersList();
+        }
+
+        function updateParkersList() {
+            const parkers = Storage.get('parkers');
+            const container = document.getElementById('parkers-container');
+            
+            container.innerHTML = parkers.map(parker => `
+                <div class="parker-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h5>${parker.name}</h5>
+                        <span class="status-indicator ${parker.isOnline ? 'status-active' : 'status-offline'}">
+                            ${parker.isOnline ? 'Online' : 'Offline'}
+                        </span>
+                    </div>
+                    <p><strong>Vehicle:</strong> ${parker.vehicle}</p>
+                    <p><strong>Rating:</strong> ${parker.rating}★</p>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button class="btn btn-secondary btn-small" onclick="editParker('${parker.id}')">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="removeParker('${parker.id}')">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePinDropMode() {
+            pinDropMode = !pinDropMode;
+            const btn = document.getElementById('pin-mode-btn');
+            btn.innerHTML = `
+                <i class="fas fa-map-pin"></i>
+                Drop Pin Mode: ${pinDropMode ? 'ON' : 'OFF'}
+            `;
+            btn.className = `btn ${pinDropMode ? 'btn-primary' : 'btn-secondary'}`;
+            
+            if (adminMap) {
+                adminMap.getDiv().style.cursor = pinDropMode ? 'crosshair' : 'default';
+            }
+        }
+
+        function setupMapClickListener() {
+            if (adminMap) {
+                adminMap.addListener('click', (e) => {
+                    if (pinDropMode) {
+                        showAddParkerModal(e.latLng);
+                    }
+                });
+            }
+        }
+
+        function showAddParkerModal(location = null) {
+            document.getElementById('add-parker-modal').classList.remove('hidden');
+            window.pendingLocation = location;
+        }
+
+        function hideAddParkerModal() {
+            document.getElementById('add-parker-modal').classList.add('hidden');
+            document.getElementById('parker-name').value = '';
+            document.getElementById('parker-email').value = '';
+            document.getElementById('parker-phone').value = '';
+            document.getElementById('parker-vehicle').value = '';
+        }
+
+        function addParker() {
+            const name = document.getElementById('parker-name').value;
+            const email = document.getElementById('parker-email').value;
+            const phone = document.getElementById('parker-phone').value;
+            const vehicle = document.getElementById('parker-vehicle').value;
+            
+            if (!name || !email || !phone || !vehicle) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            const parker = {
+                id: 'parker_' + Date.now(),
+                userId: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                vehicle: vehicle,
+                rating: 5.0,
+                isOnline: false,
+                location: window.pendingLocation ? {
+                    lat: window.pendingLocation.lat(),
+                    lng: window.pendingLocation.lng()
+                } : null
+            };
+            
+            // Add to parkers
+            const parkers = Storage.get('parkers');
+            parkers.push(parker);
+            Storage.set('parkers', parkers);
+            
+            // Add to users
+            const users = Storage.get('users');
+            users.push({
+                id: parker.userId,
+                email: email,
+                password: 'DefaultParker123!',
+                type: 'parker',
+                name: name,
+                vehicle: vehicle,
+                phone: phone,
+                rating: 5.0,
+                earnings: 0,
+                jobsCompleted: 0,
+                isOnline: false
+            });
+            Storage.set('users', users);
+            
+            hideAddParkerModal();
+            updateAdminStats();
+            loadAdminMarkers();
+            
+            if (pinDropMode) {
+                togglePinDropMode();
+            }
+        }
+
+        function removeParker(parkerId) {
+            if (confirm('Are you sure you want to remove this parker?')) {
+                const parkers = Storage.get('parkers');
+                const updatedParkers = parkers.filter(p => p.id !== parkerId);
+                Storage.set('parkers', updatedParkers);
+                
+                updateAdminStats();
+                loadAdminMarkers();
+            }
+        }
+
+        function clearMap() {
+            if (confirm('Clear all parker locations from the map?')) {
+                Storage.set('parkers', []);
+                updateAdminStats();
+                loadAdminMarkers();
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeStorage();
+
+            
+            // Auto-refresh data every 30 seconds for real-time feel
+            setInterval(() => {
+                if (currentUser) {
+                    if (currentUser.type === 'admin') {
+                        updateAdminStats();
+                    } else if (currentUser.type === 'parker') {
+                        updateParkerStats();
+                    }
+                    
+                    // Refresh maps if they exist
+                    if (map && currentUser.type === 'user') {
+                        loadParkerLocations();
+                    }
+                    if (adminMap && currentUser.type === 'admin') {
+                        loadAdminMarkers();
+                    }
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
