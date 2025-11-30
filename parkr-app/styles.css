@@ -1,0 +1,496 @@
+:root {
+    --primary-blue: #007AFF;
+    --primary-dark: #0056b3;
+    --bg-white: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.9);
+    --text-main: #1d1d1f;
+    --text-secondary: #86868b;
+    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.08);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: #f5f5f7;
+    color: var(--text-main);
+    overflow: hidden; /* Prevent scrolling on body, app handles it */
+    height: 100vh;
+    width: 100vw;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+    background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: #f2f2f7;
+    color: var(--primary-blue);
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- Login Screen --- */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-white);
+    transition: transform 0.4s ease-in-out, opacity 0.4s;
+    z-index: 10;
+    display: none; /* Hidden by default */
+}
+
+.screen.active {
+    display: block;
+    opacity: 1;
+}
+
+#login-screen {
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.login-content {
+    width: 90%;
+    max-width: 400px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: var(--shadow-strong);
+    text-align: center;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-blue);
+    color: white;
+    font-size: 40px;
+    font-weight: 700;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+}
+
+.logo-container h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.logo-container p {
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 16px 16px 16px 48px;
+    border: 1px solid #e5e5ea;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    background: #f9f9f9;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-blue);
+    background: white;
+}
+
+.login-footer {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.login-footer span {
+    color: var(--primary-blue);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- Main App Screen --- */
+#map {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.app-header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none; /* Let clicks pass through to map where empty */
+}
+
+.app-header > * {
+    pointer-events: auto;
+}
+
+.menu-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-white);
+    border: none;
+    border-radius: 50%;
+    box-shadow: var(--shadow-soft);
+    font-size: 18px;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.location-selector {
+    background: var(--bg-white);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: var(--shadow-soft);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.profile-pic img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: var(--shadow-soft);
+}
+
+.location-toggles {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.toggle-chip {
+    background: var(--bg-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.2s;
+}
+
+.toggle-chip.active {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+/* --- Bottom Sheet --- */
+.bottom-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--bg-white);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.1);
+    z-index: 60;
+    padding: 24px;
+    padding-bottom: 40px; /* Safe area */
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translateY(0);
+}
+
+.drag-handle {
+    width: 40px;
+    height: 4px;
+    background: #e5e5ea;
+    border-radius: 2px;
+    margin: 0 auto 20px;
+}
+
+.sheet-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.sheet-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Idle State */
+.search-input {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.search-input i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-input input {
+    width: 100%;
+    padding: 14px 14px 14px 44px;
+    background: #f2f2f7;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.recent-places {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.place-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f2f2f7;
+}
+
+.place-icon {
+    width: 36px;
+    height: 36px;
+    background: #e5e5ea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+/* Selected State */
+.spot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.spot-info h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.spot-info .distance {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.spot-info .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f2f2f7;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.spot-info .rating i {
+    color: #ffcc00;
+}
+
+.spot-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.parker-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.parker-preview img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.parker-details p {
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.parker-details .car-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* Route State */
+.route-status {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #e5e5ea;
+    border-radius: 3px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-blue);
+    width: 0%;
+    transition: width 2s linear;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.action-buttons > button {
+    flex: 1;
+}
+
+/* Exchange State */
+#state-exchange {
+    text-align: center;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #34c759;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 20px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+/* Leaflet Customization */
+.custom-marker-icon {
+    background: none;
+    border: none;
+}
+
+.marker-pin {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-blue);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 122, 255, 0.4);
+    border: 3px solid white;
+}
+
+.marker-pin::after {
+    content: 'P';
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    transform: rotate(45deg); /* Counteract parent rotation */
+}
